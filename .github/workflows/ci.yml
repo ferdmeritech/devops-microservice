@@ -1,33 +1,30 @@
-name: CI
+name: build-and-test
 
 on:
   push:
-    branches:
-      - main      # o la rama que uses para producción
+    branches: [ main ]
   pull_request:
+    branches: [ main ]
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+    - uses: actions/checkout@v3
 
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v4
-        with:
-          python-version: 3.11
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.11
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-      - name: Run tests
-        run: pytest
-        env:
-          PYTHONPATH: "${{ github.workspace }}/app"
+    - name: Set PYTHONPATH
+      run: echo "PYTHONPATH=$(pwd)" >> $GITHUB_ENV
 
-      - name: Build Docker image
-        run: |
-          docker build -t devops-microservice .
+    - name: Run pytest
+      run: pytest
